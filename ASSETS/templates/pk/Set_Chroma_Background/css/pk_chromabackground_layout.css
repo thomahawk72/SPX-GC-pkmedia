@@ -1,0 +1,40 @@
+
+
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+  
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+  
+body, html {
+    margin: 0px;
+    overflow: hidden;
+    padding: 0;
+    background-color: rgba(0,0,0,0.0);
+}
+  
+  
+/* HTML Tags Above, Custom Classes Below (alphabetized) */
+
+.hide{
+    display: none;
+}
+
+  
+.SPXWindow {
+    position: absolute; 
+    /* background-image: url('../img/arrows.png'); */
+    background-size: 100% 100%;
+    background-color: rgba(0, 0, 0,0);
+    overflow: hidden;
+    transform-origin: top left;
+    border: 0px solid rgb(0, 255, 0) ;
+    width: 1920px;
+    height: 1080px;
+}
+  
+ 

@@ -21,8 +21,8 @@ devnotes.txt
 DATAROOT_*
 
 # DATAROOT - Add just the DATAROOT/HelloWorld-project
-DATAROOT/*
-!DATAROOT/HelloWorld-project/
+#DATAROOT/*
+#!DATAROOT/HelloWorld-project/
 
 # DEV FOLDERS and FILES
 DEV_*/**
@@ -32,28 +32,7 @@ __env.json
 
 
 # ASSETS
-!ASSETS/
-ASSETS/*
-!ASSETS/excel/ticker/
-!ASSETS/templates/softpix/Template_Pack_1.1/*
-!ASSETS/csv/
-ASSETS/csv/*.csv
-# ASSETS/media/video/
-# ASSETS/media/e-urheilu/
-# ASSETS/media/images/hd/
-# ASSETS/media/images/bg/
-# ASSETS/media/images/demo/
-# ASSETS/media/images/logo/
-# ASSETS/media/images/hd_org/
-# ASSETS/media/images/bg_old/
-# ASSETS/media/images/logo_org/
-# ASSETS/media/images/smartpx_internal/
-# ASSETS/media/images/_*
-# ASSETS/template_stash/
-# ASSETS/templates_dev/
-# ASSETS/hot_or_not
-# ASSETS/xml/demo.xml
-# ASSETS/excel/tellyo/
+
 
 ASSETS_DEF/
 
@@ -171,3 +150,4 @@ _env.json
 .gitignore
 
 ASSETS/default_assets.txt
+.gitignore
