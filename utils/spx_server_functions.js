@@ -21,9 +21,6 @@ if (!config.general) {
 }
 
 const port = config.general.port || 5656;
-// let Connected=true; // used we messaging service // FIXME: Remove?
-
-// Use crypto instead of bcrypt:
 let crypto;
 try {
   crypto = require('crypto');
@@ -33,10 +30,26 @@ try {
 
 module.exports = {
 
+  appendProjectFile: async function (rundownData, fullpath, referrer='') {
+    // Added in 1.3.2
+    // Append project and rundown info to the rundownData object
+    // Yeah, this could be fancier.
+    if (referrer) {
+      // console.log('DEV - appendProjectFile project/filename ' + fullpath);
+    }
+    let fldrname = path.dirname(fullpath);
+    let rundname = path.basename(fullpath).replace('.json', '');
+    let pathItems = fldrname.split('\\');  // Works on all platforms?
+    let project = pathItems[pathItems.length-2];
+    rundownData.project = project
+    rundownData.rundown = rundname
+    return rundownData
+  },
+
 
   httpGet: function (url) {
     // A generic http/get sender utility
-    // used by heartbeat pusher
+    // used by heartbeat pusher (and OSC)
     axios.get(url)
     .then(function (response) {
       return response
@@ -49,26 +62,32 @@ module.exports = {
 
   httpPost: function (JSONdata, endPoint) {
     // Send a http POST to an endpoint on the SPX server.
-    // console.log('httpPost received', endPoint, JSONdata);
-    let JSONdata2 = JSON.stringify(JSONdata);
+    // v1.3.2 Fixed bug with special characters
+    // v1.3.3 Fixed a bug with JSONdata type check (JSON or string)
+
+    let dataOut = JSONdata;
+
+    var stringConstructor = "mockup string".constructor;
+    if (JSONdata.constructor === stringConstructor) {
+      dataOut = JSON.parse(JSONdata);
+    }
+
     try {
-      //JSONdata = JSON.stringify(JSONdata);
       const options = { port: port, path: endPoint, method: 'POST', headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': JSONdata2.length
+          'Content-Type': 'application/json; charset=UTF-8',
         }
       }
       const httpreq = http.request(options, result => {
         result.on('data', d => {
           process.stdout.write(d)
-          return 'Sent request to server:' + port + ':' + endPoint + JSONdata2
+          return 'Sent request to server:' + port + ':' + endPoint + ' ' + JSON.stringify(dataOut)
         })
       })
       httpreq.on('error', error => {
         logger.error(error)
         return error
       })
-      httpreq.write(JSONdata2)
+      httpreq.write(JSON.stringify(dataOut))
       httpreq.end()
     } catch (error) {
       logger.error('ERROR in spx.httpPost()', error);
@@ -77,7 +96,7 @@ module.exports = {
   
   CCGServersConfigured: function () {
     // helper function which will return true / false
-      if (config.casparCG && config.casparCG.servers && config.casparCG.servers.length > 0) {
+      if (config?.casparcg?.servers && config?.casparcg?.servers?.length > 0) {
         return true;
       } else {
       return false
@@ -94,10 +113,12 @@ module.exports = {
       logger.verbose('checkServerConnections -function excecuting...');
       data = { spxcmd: 'updateStatusText', status: 'Checking server connections...' };
       io.emit('SPXMessage2Client', data);
+
       config.casparcg.servers.forEach((element,i) => {
         let SrvName = element.name;
         let SocketIndex = PlayoutCCG.getSockIndex(SrvName);
         logger.verbose('Pinging ' +  SrvName + ': ' + CCGSockets[SocketIndex]);
+        // console.log('Pinging ' +  SrvName + ': ' + CCGSockets[SocketIndex]);
         data = { spxcmd: 'updateServerIndicator', indicator: 'indicator' + i, color: '#CC0000' };
         let status = {}
         status.server = i + ':' + SrvName;
@@ -118,8 +139,25 @@ module.exports = {
     }
   }, // checkServerConnections
 
+
+  cleanUpString: function (str) {
+    // Utility added in 1.3.2
+    // Clean up a string for HTML output
+    // console.log('cleanUpString', str);
+    let temp1 = str.replace(/\n/g, '<br>');  // remove \n globally to support text areas
+    let temp2 = temp1.replace(/\r/g, '');    // remove \r globally to support text areas
+    // I am losing sleep over this - but it works! (Added 26.10.2020)
+    temp2 = temp2.replace(/&/g, "&amp;");
+    temp2 = temp2.replace(/>/g, "&gt;");
+    temp2 = temp2.replace(/</g, "&lt;");
+    temp2 = temp2.replace(/"/g, "&quot;");
+    temp2 = temp2.replace(/'/g, "&#039;");
+    temp2 = temp2.replace(/\\/g, "&#92;");
+    return temp2;
+  }, // cleanUpString
+
+
   duplicateFile: function (fileRefe, suffix) {
-    // TODO: Tämä on kesken!
     try {
       return new Promise(resolve => {
         let fldrname = path.dirname(fileRefe);
@@ -128,7 +166,7 @@ module.exports = {
         let copyfile =  path.normalize(path.join(fldrname, basename + suffix + extename));
         fs.copyFile(fileRefe, copyfile, (err) => {
             if (err) throw err;
-            logger.info('Rundown file ' + fileRefe + ' was copied to ' + copyfile + '.');
+            logger.verbose('Rundown file ' + fileRefe + ' was copied to ' + copyfile + '.');
             resolve()
             return true
           });
@@ -288,7 +326,7 @@ module.exports = {
       return JSON.parse(contents);
     }
     catch (error) {
-      logger.error('ERROR in spx.GetJsonData(): ' + error);
+      logger.error('ERROR in spx.GetJsonData() Invalid JSON Data?: ' + error);
       return (error);
     }
   }, // GetJsonData ended
@@ -338,7 +376,7 @@ module.exports = {
       TemplateServer = "";
       logger.verbose('Using filesystem and caspar.config for template-path.');
     } else if ( !TemplateSource || TemplateSource == 'spx-ip-address') {
-      TemplateServer = 'http://' + ip.address(); // TODO: https one day? 
+      TemplateServer = 'http://' + ip.address(); // For https see https://spxgc.tawk.help/article/https-protocol
       logger.verbose('Using ip.address() for TemplateServer IP address: ' + TemplateServer);
     } else {
       if (TemplateSource.substring(0, 4)!='http') {TemplateSource = 'http://' + TemplateSource}
@@ -371,6 +409,17 @@ module.exports = {
     return false;
   }, // hashcompare
 
+
+  isJson: function(item) {
+    let value = typeof item !== "string" ? JSON.stringify(item) : item;    
+    try {
+      value = JSON.parse(value);
+    } catch (e) {
+      return false;
+    }
+    return typeof value === "object" && value !== null;
+  }, // isJson
+
   lang: function (str) {
     try {
       const spxlangfile = config.general.langfile || 'english.json';
@@ -395,15 +444,29 @@ module.exports = {
     }
   }, // getStartUpFolder
 
+  getDatarootFolder: function () {
+    // Added in 1.3.1
+    let datapath = config.general.dataroot || this.getStartUpFolder() + '/' + 'DATAROOT';
+    if (fs.existsSync(datapath)) {
+      return path.normalize(datapath);
+    } else {
+      logger.error('Data root folder "' + datapath + '" not found! Verify config!');
+      return null;
+    }
+  }, // getDatarootFolder
+
 
   GetSubfolders: async function (strFOLDER) {
     // return a list of all subfolders in a given folder
     // console.log('Trying to get subfolders of ' + strFOLDER);
+    // ignores folders starting with . or _ (Added in 1.3.0)
     try {
       let FOLDER = path.normalize(strFOLDER);
       if (fs.existsSync(FOLDER)) {
       return fs.readdirSync(FOLDER).filter(function (file) {
-        return fs.statSync(FOLDER+'/'+file).isDirectory();
+        return (fs.statSync(FOLDER+'/'+file).isDirectory() &&
+        file.charAt(0) != '.' &&
+        file.charAt(0) != '_');
       });
       } else {
         logger.error('Source folder didnt exist "' + strFOLDER + '", so it was created.');
@@ -429,7 +492,6 @@ module.exports = {
 
     let jsonData = [];
     try {
-      // console.log('reading',FOLDER);
       
       fs.readdirSync(FOLDER).forEach(file => {
         let bname = path.basename(file, '.json');
@@ -451,9 +513,8 @@ module.exports = {
   GetTemplatesFromProfileFile: async function (FOLDERstr) {
     // Return templates of the given project. Added in 1.1.4.
     try {
-      // console.log('reading',FOLDER);
       let showFolder   = path.normalize(FOLDERstr);
-      let dataJSONfile = path.join(this.getStartUpFolder(), 'ASSETS', '..', 'DATAROOT', showFolder, 'profile.json');
+      let dataJSONfile = path.join(this.getDatarootFolder(), showFolder, 'profile.json'); // Changed in v1.3.1.
       if (fs.existsSync(dataJSONfile)) {
         logger.debug("Getting templates from " + dataJSONfile + "...");
         let profileData  = await this.GetJsonData(dataJSONfile);
@@ -496,8 +557,10 @@ module.exports = {
         fs.readdirSync(datafolder).forEach((file, index) => {
           const curPath = path.join(datafolder, file);
           if (fs.lstatSync(curPath).isDirectory()) { 
-              // it is folder
-              data.foldArr.push(path.basename(curPath));
+              // it is folder, and does not start with . or _
+              if (file.charAt(0) != '.' && file.charAt(0) != '_') {
+                data.foldArr.push(path.basename(curPath));
+              }
             }
           else {
             // it is file
@@ -519,8 +582,7 @@ module.exports = {
         data.fileArr.sort();
         data.foldArr.sort();
         return data;
-      }
-      else {
+      } else {
         return "not-found";
       }
       
@@ -658,6 +720,17 @@ module.exports = {
     }
   }, // prettifyName
 
+  RemoveFilepathKey: function (RundownData) {
+    if (RundownData.filepath) {
+      // Some version of SPX stored filepath into the
+      // rundown file. This is not needed and should
+      // be removed, so the below line fixes the file.
+      logger.verbose('Removing ".filepath" from "' + RundownData.filepath + '"...');
+      delete RundownData.filepath;
+    }
+    return RundownData;
+  }, // RemoveFilepathKey
+
   renameRundown: function (orgfile, newname) {
     // Rename a file:
     // request ..... full original name (c:/temp/volvo.txt), new basename (toyota)
@@ -760,9 +833,9 @@ module.exports = {
           }
       });
       recentsArray.unshift(rundownRef);
-      if (recentsArray.length > 3 ) {recentsArray.length = 3}; // limit to 3
+      if (recentsArray.length > 5 ) {recentsArray.length = 5}; // limit to 5
       config.general.recents = recentsArray;
-      this.writeFile(configfileref,config); //TODO:
+      this.writeFile(configfileref,config);
     } catch (error) {
       logger.error('ERROR in spx.setRecents (fileref: ' + rundownRef + '): ' + error);  
     }
@@ -781,6 +854,19 @@ module.exports = {
     }
   }, // shortifyName
 
+
+  strip: async function (html) {
+    // Strip HTML tags from a string to sanitize it
+    try {
+      let noHtml = html.replace(/<\/?[^>]+(>|$)/g, "").replace(/\s+/g,' ');  // remove <TAGS> and double spaces
+      return noHtml;
+    } catch (error) {
+      logger.error('ERROR in spx.strip (html: ' + html + '): ' + error);
+      return ""
+    }
+ }, // strip
+
+
   versInt: function (semver){
     // Returns a numeric value representing "1.0.0" formatted semantic version string.
     // This works as long as max value of each field is 99!
@@ -793,21 +879,25 @@ module.exports = {
     return versInt
   }, // versInt
 
-  writeFile: function (filepath,data) {
-    // console.log('Writing file ', filepath);
+  writeFile: function (filepath, data) {
     try {
         return new Promise(resolve => {
-          this.talk('Writing file');
+          // this.talk('Writing file');
           // this.playAudio('beep.wav', 'spx.writeFile');
           data.warning = "Modifications done in the SPX will overwrite this file.";
-          data.copyright = "(c) 2020-2023 Softpix (https://spx.graphics)";
+          data.copyright = "(c) 2020- SPX Graphics (https://spx.graphics)";
           data.updated = new Date().toISOString();
           let filedata = JSON.stringify(data, null, 2);
+
+          if (!filepath) {
+            logger.warn('spx.writeFile // No filepath given, not saving anything.');
+            return
+          }
+
           fs.writeFile(filepath, filedata, 'utf8', function (err) {
             if (err){
-              logger.error('spx.writeFile - Error while saving: ' + filepath + ': ' + err);
+              console.error('spx.writeFile // Error saving: [' + filepath + ']: ' + err);
               return 
-              // throw error;
             }
             logger.verbose('spx.writeFile - File written OK: ' + filepath);
             resolve()
@@ -815,7 +905,7 @@ module.exports = {
           }
         )
     } catch (error) {
-      logger.error('spx.writeFile - Error while saving: ' + filepath + ': ' + error);    
+      logger.error(error);
       return 
     }
   }, // writeFile (.json)

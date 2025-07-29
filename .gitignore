@@ -1,18 +1,14 @@
-############################
-# SmartPX's unwanted files #
-############################
-.vscode/
-.VSCodeCounter/
-node_modules/
-pkg-builds/
-zip_builds/
-ZIP_TEMP/
-Distro/
-bin/
-viz/
+##################
+# UNWANTED FILES #
+##################
+._*
+*.gz
+*.md
+*.7z
 *.mov
 *.mp4
 *.mp3
+*.txt
 SmartPX_log*.txt
 .env
 env.txt
@@ -37,7 +33,6 @@ __env.json
 ASSETS_DEF/
 
 static/*.json
-
 
 
 
@@ -132,22 +127,86 @@ desktop.ini
 # git has its own built in compression methods
 *.7z
 *.dmg
-*.gz
 *.iso
 *.jar
 *.rar
 *.tar
 *.zip
-RUN_DEV.lnk
-RUN_DEV.BAT
-api-tester.rest
-config_ORGjson
-TESTAUS_CHECKLIST.txt
-TODO.md
-
+*.log
+*.env
+*.bat
+*.lnk
+cg20.*
+*.rest
 env.json
-_env.json
+thumbs.db
+Thumbs.db
+*env.json
 .gitignore
+desktop.ini
+*config*.json
+static/*.json
+*.pdf
+sea-*.*
+pro--*.*
+PRO--*.*
+
+## Temp files or drafts
+zzz*.*
+ORG*.*
+
+## But do these
+!CONTRIBUTING.md
+
+
+############################
+# UNWANTED GENERAL FOLDERS #
+############################
+viz/
+bin/
+notes/
+notes2/
+Distro/
+DEV_*/**
+DEF_*/**
+.Trashes
+.vscode/
+ZIP_TEMP/
+DATAROOT*
+.DS_Store
+pkg-builds/
+zip_builds/
+kubernetes/
+node_modules/
+.VSCodeCounter/
+.Spotlight-V100
+static/templateviewer/
+CONTENT_REPOSITORIES*/**
+spx-content-repo.txt
+
+
+# IGNORE SPX DATAROOT
+# ...but allow specific files and folders for GitHub
+DATAROOT/
+!DATAROOT/MyFirstProject/
+
+
+# IGNORE SPX ASSETS
+# ...but allow specific files and folders for GitHub
+ASSETS/**
+!ASSETS/csv/csv-folder.md
+!ASSETS/excel/ticker-demo/basic-news-ticker.xlsx
+# Add templates with:
+# git add ASSETS/templates/softpix/Template_Pack_1.3.2/** -f
+
+# ...allow some PLUGIN files for GitHub
+!ASSETS/plugins/lib
+!ASSETS/plugins/spxLinks
+!ASSETS/plugins/panicButton
+!ASSETS/plugins/animateAllOut
+
+# ..and include some PLUGIN files for GitHub
+!ASSETS/ExtraFunctions/modules
+!ASSETS/ExtraFunctions/spx_internal_demo_functions.js
 
 ASSETS/default_assets.txt
-.gitignore
