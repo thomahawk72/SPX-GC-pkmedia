@@ -1,47 +1,39 @@
 
 # SPX Release Notes
-> Updated 2024-12-15<br>
+> Updated 2026-05-28<br>
 <small>Most recent updates are at the top.</small>
 
 <BR>
 
-**⚠ PLEASE UNDERSTAND:** Features and changes below may not fully work as the source code is constantly under development. For a stable and more tested version, please use the published binary releases below.
+**⚠ PLEASE UNDERSTAND:** Features and changes below may not fully work as the source code is constantly under development. For a stable and more tested version, please use the published binary releases.
 
-## Coming up later...
-- Add several (not all) templates to a rundown at once
-- spxpack import/export
-- ctrl+drag rundown items to make them children
-- OSC implementation
-- Rundown Variables (does not remove prVar from profile if no users)
-
-<BR>
-<BR>
-
-# Current dev notes v.1.3.4
-* Working on a new optional, section to **rundown datafiles** for rundown specific, static, information banner at the top of the rundown. This can become useful for tutorials, and such. Currently this must be added to the rundown files manually. All values are optional, except "body". Supported types: `info` (green accents) and `warn` (red). See example below:
-```json
-  "notification": {
-    "type": "info",
-    "head": "Rundown comment",
-    "body": "Lorem ipsum dolor sit amet!",
-    "pict": "https://static.spxcloud.app/controller-notification/STORE-BLACK-FRIDAY-50-OFF.png",
-    "link": "https://spxgc.tawk.help/article/some-page",
-    "text": "Read more"
-  }
-```
-
-
-These are in a broken, work-in-progress, state:
-
-* API/feedproxy post handler `executePOSTRequest()`
-* Drag and drop an image to the local renderer to set the static background using "setRendererBackgroundImage" -handler
-* All demo/production extensions must be redone, with public APIs and apikey config option!
-
-<BR>
-<BR>
+* Fixes a string/bool type error in server.js
 
 
 # Published releases
+
+## **1.4.1** (May 28 2026)
+
+* Fixes a CasparcCG AMCP "undefined" (as string) of empty fields
+* Minor cleanup, re-enable a couple of ControllerAPI endpoints
+* Registration form backend changes
+* Version api endpoint information improved
+* Generates a default hostname to config.json at first launch
+
+
+## **1.4.0** (Mar 08 2026)
+
+1.4.0 is a major version release to align "SPX Solo" with the full SPX Graphics product range announced at IBC tradeshow in September 2025. See https://spxgraphics.com/software for the product range including SPX Production, SPX Broadcast and related other extensions and integrations.
+
+* Adds support for OGraf files (Open Graphics Specification by EBU)
+* 5 layers, simplified APIs
+* Documentation links updated
+* Dozens of bug fixes and stability improvements
+
+
+## **1.3.4** (Jan 04 2026)
+
+1.3.4 is a patch with a fix for the renderer embedding.
 
 ## **1.3.3** (Dec 31 2024)
  >See also [Latest changes Knowledge Base article](https://spxgc.tawk.help/article/latest-changes) for selected feature highlights. 

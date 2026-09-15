@@ -27,13 +27,6 @@ router.get('/system', function (req, res) {
 });
 
 router.get('/requestInfo', async (req, res) => {
-  // Private API endpoint.
-  // http://localhost:5656/CCG/requestInfo?server=OVERLAY&command=CLS
-  // Try commands "INFO", "INFO 1", "CLS"
-  // These require scanner.exe be running on the server
-  // Response is plain text but some of them can be parsed as XML... 
-  // See https://github.com/CasparCG/help/wiki/AMCP-Protocol
-  // This creates a new temporary tcp/ip connection for the request.
   var SERVER  = req.query.server;   // ?server=OVERLAY
   var COMMAND = req.query.command;  // &command=INFO
   // console.log('requestInfo from ' + SERVER + ', cmd: ' + COMMAND);
@@ -140,6 +133,7 @@ router.get('/control/:data', (req, res) => {
     let TEMPLATEDATA = "";
     if (data.fields) {
       data.fields.forEach(item => {
+        logger.verbose('Processing field for CCG: ' + item.id + ' with value: ' + item.value);
         TEMPLATEDATA += spx.CGComponentFactory(item.id, item.value)
       });
     }

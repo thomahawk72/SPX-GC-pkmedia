@@ -20,7 +20,7 @@
   <script src="/js/anime.min.js"></script>
   <script>
     function website() {
-      window.open('https://spx.graphics', '_spx');
+      window.open('https://spxgraphics.com', '_spx');
     }
 
     function start() {
@@ -199,7 +199,7 @@
               <td>
                 <div>
                   <img src="/img/SPX_glossy_255_Transparent_Shadow.png" style="height: 4.0em; float:right; margin-right: 1em;">
-                  <h1 style="padding:0px; margin:0px; font-size: 1.0em;">SPX Graphics</h1>
+                  <h1 style="padding:0px; margin:0px; font-size: 1.0em;">SPX Graphics </h1>
                   <span class="spxInfotext" style="font-size: 0.8em; opacity:0.5;">
                     {{lang 'general.slogan'}}<BR>
                   </span>
@@ -215,7 +215,7 @@
                   <button onmouseover="tip('{{lang 'hover.navishows'}}');" class="spxformtext btn spxFlexItem bg_orange ripple" onclick="start();">{{lang 'button.launch'}}</button>
                   <button onmouseover="tip('{{lang 'hover.config'}}');" class="spxformtext btn spxFlexItem bg_grey15 ripple" onclick="appconfig()"><i class="fas fa-wrench"></i>&nbsp;{{lang 'button.config'}}</button>
                   <button onmouseover="tip('{{lang 'hover.docs'}}');" class="spxformtext btn spxFlexItem bg_blue ripple" onclick="help('/')">{{lang 'button.help'}}</button>
-                  <button onmouseover="tip('spx.graphics');" class="spxformtext btn spxFlexItem bg_blue ripple" onclick="website()">website</button>
+                  <button onmouseover="tip('spxgraphics.com');" class="spxformtext btn spxFlexItem bg_blue ripple" onclick="website()">website</button>
                 </div>
 
                 <!-- Notifications from the SPX messaging service: -->
@@ -237,8 +237,9 @@
 
                 <!-- server / msgsrvs / notifications -->
                 <div id="promo" style="opacity: 0;">
-                  <A id="homepagepromolink" href="https://youtu.be/rdIkuza3MQI" target="_yt">
-                  <IMG id="homepagepromopict" class="auto-resizable-iframe" SRC="/img/yt_mockup.png" TITLE="Default image"></A>
+                  <A id="homepagepromolink" href="https://spxgraphics.com/software" target="_mothership">
+                    <img id="homepagepromopict" class="auto-resizable-iframe" SRC="/img/welcome-splash-tiers.png" alt="Splash screen promo">
+                  </A>
                 </div>
               </td>
             </tr>
@@ -259,6 +260,28 @@
 
 
   <script>
+
+    const css1 =
+        "box-sizing: border-box;" +
+        "font-size: 12px;" +
+        "background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(160deg, rgba(238, 255, 238, 0.5) 0%, #00aa00 20%, #112233 70%);" +
+        "border-bottom: 2px solid rgba(0,0,0,0.5);" +
+        "border-top: 2px solid rgba(255,255,255,0.5);" +
+        "border-left: 4px solid rgba(0,0,0,0.5);" +
+        "border-right: 2px solid rgba(255,255,255,0.2);" +
+        "margin: 2em 0;" +
+        "text-shadow: 0 2px 4px black;" +
+        "font-family: Arial;" +
+        "color: white;" +
+        "text-align: center;" +
+        "padding: 0.3em 2em;" +
+        "width: 300px;" +
+        "letter-spacing: 0.1em;" +
+        "border-radius: 1em;";
+    let YYYY = new Date().getFullYear();
+    const txt1 = "%c© " + YYYY + " SPX Graphics 👋 All Rights Reserved.";
+    console.log(txt1, css1);
+
     // check for upgrade
     document.getElementById('upgradeBubble').style.display="none";
     heartbeat(202); // page identifier

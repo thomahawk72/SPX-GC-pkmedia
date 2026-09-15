@@ -49,7 +49,10 @@ module.exports = {
         <data id=\"text\" value=\"Donald Trump\"/>
     </componentData>
     */
-    let decodedValue = decodeURIComponent(value) || "null"; // changed 05092020. Was += " " <:-/
+
+    logger.debug('CGComponentFactory (for XML data only) - fieldID: ' + fieldID + ', value: ' + value);
+
+    let decodedValue = decodeURIComponent(value) || ""; // changed again. Was += " " and then "null" <:-/
     return `<componentData id=\\"${fieldID}\\"><data id=\\"text\\" value=\\"${decodedValue}\\"/></componentData>`;
   },
 
@@ -104,26 +107,28 @@ module.exports = {
         if (data.fields) {
           data.fields.forEach((item,index) => {
             logger.debug('  DATA --> ' + item.field + ' : ' + item.value);
+
+            // Fixes "undefined" issue in AMCP playout
+            let value = ""; // default value if null or undefined
+            if (item.value!=null && typeof item.value !== 'undefined') {
+              value = item.value.toString();
+            }
+
             if (DataType == 'xml'){
               // generate data in XML format
-              TEMPLATEDATA += this.CGComponentFactory(item.field, item.value);
-              } 
-            else
-              {
-                // generate data in JSON format
-                TEMPLATEDATA += '\\"' + item.field + '\\":\\"' + item.value + '\\",';
-                // Examples in XML and JSON
-                // correct xml : CG 1-10 ADD 0 "SMARTPX/GC_PACK_2/HEADLINE" 1 "<templateData><componentData id=\"f0\"><data id=\"text\" value=\"KEPPI\"/></componentData><componentData id=\"f1\"><data id=\"text\" value=\"Kepponen\"/></componentData></templateData>"\r\n
-                // correct json: CG 1-10 ADD 0 "SMARTPX/GC_PACK_2/HEADLINE" 1 "{\"f0\":\"KEPPI\",\"f1\":\"Kepponen\"}"\r\n
-                // testing json: CG 1-12 ADD 1 "smartpx/GC_YSV/Otsikko"     1 "{\"f0\":\"KEPPI\",\"f1\":\"Kepponen\"}"\r\n
-              }
+              TEMPLATEDATA += this.CGComponentFactory(item.field, value); 
+            } else {
+
+              logger.debug('Generating JSON data for CasparCG, field: ' + item.field + ', value: ' + value);
+
+              TEMPLATEDATA += '\\"' + item.field + '\\":\\"' + value + '\\",';
+            }
           });
         }
         if (DataType == 'xml'){
           // finalize XML format
           DataStr = "<templateData>" + TEMPLATEDATA + "</templateData>";
-        }
-        else{
+        } else {
           // finalize JSON formatby removing trailing comma
           if (TEMPLATEDATA.slice(-1)==','){
             TEMPLATEDATA = TEMPLATEDATA.slice(0, -1);
