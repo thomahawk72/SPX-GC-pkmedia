@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image layer</title>
+    <link rel="stylesheet" type="text/css" href="css/pk_chromabackground_layout.css">
+    <script src="js/pk_chromabackgroundHandler.js"></script>    
+    
+
+
+    <style>
+        #imagelayer  {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+            opacity: 1;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100% 100%;
+                /*
+                    COVER     = scale up to fill area, keep aspect ratio (may crop)
+                    CONTAIN   = scale down to fit inside, keeping aspect ratio (no cropping)
+                    100% 100% = force from corner to corner (may stretch)
+                */
+        }
+    </style>
+
+    <script type="text/javascript">
+        window.SPXGCTemplateDefinition = {
+            "description": "Sets chroma as background for rundown (L2)",
+            "playserver": "OVERLAY",
+            "playchannel": "1",
+            "playlayer": "2",
+            "webplayout": "2",
+            "out": "manual",
+            "uicolor": "7",
+            "dataformat": "json",
+            "DataFields": [
+                {
+                    "field" : "comment",
+                    "ftype" : "textfield",
+                    "title" : "Name item for rundown",
+                    "value" : "[ Item name ]"
+                },
+                {
+                    "ftype": "instruction",
+                    "value": "Loads Chroma as background image in renderer"
+                },
+            ]
+        };
+    </script>
+
+    <script>
+ 
+        function runAnimationIN() {
+            var divtag=document.getElementById('imagelayer');
+            divtag.style.backgroundImage="url('/media/images/hd/chroma.png')";
+        }
+
+
+        function runAnimationOUT() {}
+    </script>
+
+</head>
+<body>
+    <div class="SPXWindow">
+        <div id="gfx" class="gfx">
+            <div id="imagelayer">&nbsp;</div>
+        </div>
+    </div>
+
+    
+</body>
+</html>
